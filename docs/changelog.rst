@@ -42,11 +42,15 @@ Bug fixes:
   issues in the future.
   :bug:`5289`
 * :doc:`plugins/discogs`: Fix the ``TypeError`` when there is no description.
-* Remove single quotes from all SQL queries
+* Use single quotes in all SQL queries.
   :bug:`4709`
 * :doc:`plugins/lyrics`: Update ``tekstowo`` backend to fetch lyrics directly
   since recent updates to their website made it unsearchable.
   :bug:`5456`
+* :doc:`plugins/lyrics`: Rewrite lyrics tests using pytest to provide isolated
+  configuration for each test case. This fixes the issue where some tests
+  failed because they read developer's local lyrics configuration.
+  :bug:`5133`
 
 For packagers:
 
