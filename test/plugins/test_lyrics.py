@@ -205,7 +205,7 @@ class LyricsBackendTest(PluginMixin):
         """
         title = "Lady Madonna"
 
-        res = backend.fetch("The Beatles", title, "", 0.0)
+        res = backend.fetch("The Beatles", title, "", 180.0)
 
         assert res
         assert PHRASE_BY_TITLE[title] in res.lower()
@@ -391,7 +391,8 @@ class TestLRCLibLyrics(LyricsBackendTest):
 
     @pytest.fixture
     def fetch_lyrics(self, backend, requests_mock, request_kwargs):
-        requests_mock.get(backend.base_url, **request_kwargs)
+        requests_mock.get(backend.GET_URL, status_code=HTTPStatus.NOT_FOUND)
+        requests_mock.get(backend.SEARCH_URL, **request_kwargs)
 
         return partial(backend.fetch, "la", "la", "la", self.ITEM_DURATION)
 
@@ -408,7 +409,14 @@ class TestLRCLibLyrics(LyricsBackendTest):
         [
             pytest.param([], None, id="handle non-matching lyrics"),
             pytest.param(
-                [lyrics_match()], "synced", id="synced when available"
+                [lyrics_match()],
+                "synced",
+                id="synced when available",
+            ),
+            pytest.param(
+                [lyrics_match(duration=1)],
+                None,
+                id="none: duration too short",
             ),
             pytest.param(
                 [lyrics_match(instrumental=True)],
