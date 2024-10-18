@@ -1675,14 +1675,18 @@ def update_items(lib, query, album, move, pretend, fields, exclude_fields=None):
                 )
                 continue
 
+            old_item = lib.get_item(item.id)
+            
             # Special-case album artist when it matches track artist. (Hacky
             # but necessary for preserving album-level metadata for non-
             # autotagged imports.)
             if not item.albumartist:
-                old_item = lib.get_item(item.id)
                 if old_item.albumartist == old_item.artist == item.artist:
                     item.albumartist = old_item.albumartist
                     item._dirty.discard("albumartist")
+
+            if old_item.albumtype in item.albumtypes:
+                item.albumtype = old_item.albumtype
 
             # Check for and display changes.
             changed = ui.show_model_changes(item, fields=item_fields)
@@ -2292,6 +2296,9 @@ def write_items(lib, query, pretend, force):
             )
             continue
 
+        if item.albumtype in clean_item.albumtypes:
+            clean_item.albumtype = item.albumtype
+        
         # Check for and display changes.
         changed = ui.show_model_changes(
             item, clean_item, library.Item._media_tag_fields, force
